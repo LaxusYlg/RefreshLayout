@@ -654,7 +654,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingChild, Ne
          * then {@link OnRefreshListener} will be called if there is one.
          *
          * @param isScrolling whether this method being called during scrolling.
-         * @param changed
+         * @param changed     whether current refresh state has changed
          */
         protected abstract void prepare(boolean isScrolling, boolean changed);
 
@@ -662,7 +662,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingChild, Ne
          * finish refresh state, reset to its original state.
          *
          * @param isScrolling whether this method being called during scrolling.
-         * @param changed
+         * @param changed     whether current refresh state has changed
          */
         protected abstract void finish(boolean isScrolling, boolean changed);
 
@@ -754,8 +754,6 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingChild, Ne
                 mRefreshLayout.abortScrolling();
             }
             boolean changed = mIsRefreshing ^ refresh;
-            System.out.println("refresh " + refresh + " is " + mIsRefreshing + " state " + (mIsRefreshing ^ refresh)
-                    + " changed " + changed);
             mIsRefreshing = refresh;
             if (mIsRefreshing) {
                 prepare(isScrolling, changed);

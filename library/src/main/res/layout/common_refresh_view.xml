@@ -13,8 +13,7 @@
             android:id="@+id/image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/arrow" />
+            android:layout_gravity="center_vertical" />
 
         <TextView
             android:id="@+id/text_view"
@@ -23,8 +22,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="8dp"
             android:gravity="center"
-            android:text="refreshing"
-            android:textColor="#D8D8D8" />
+            android:textColor="#A1A1A1" />
     </LinearLayout>
 
 </FrameLayout>

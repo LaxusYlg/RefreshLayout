@@ -1,6 +1,7 @@
 package com.laxus.android.refreshlayout.view;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -22,13 +23,10 @@ public class LineSpinLoadingDrawable extends Drawable implements Animatable {
     private static final int[] DELAY = new int[]{0, 150, 300, 450, 600, 750, 900, 1050};
     private static final float MAX_SCALE = 1.0f;
     private static final int MAX_ALPHA = 255;
-    private static final float MIN_SCALE = .3f;
-    private static final int MIN_ALPHA = 120;
     private static final int DEFAULT_SIZE = 24;//DP
 
     private int[] mAlpha = new int[8];
     private float[] mScale = new float[8];
-    private int mRepeatCount;
 
     private int mSize;
 
@@ -40,12 +38,14 @@ public class LineSpinLoadingDrawable extends Drawable implements Animatable {
 
     private Animation mAnimation;
 
+    private long mStartTimeMill;
+
 
     public LineSpinLoadingDrawable(View parent) {
         mParent = parent;
 
         mPaint = new Paint();
-//        mPaint.setColor(Color.parseColor("#D8D8D8"));
+        mPaint.setColor(Color.parseColor("#A1A1A1"));
         mSize = (int) (parent.getResources().getDisplayMetrics().density * DEFAULT_SIZE * 1.2);
 
         for (int i = 0; i < DELAY.length; ++i) {
@@ -131,24 +131,29 @@ public class LineSpinLoadingDrawable extends Drawable implements Animatable {
         mAnimation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
-                int animateTime = (int) (mRepeatCount * ANIMATION_DURATION + ANIMATION_DURATION * interpolatedTime);
+                //duration too big , interpolatedTime always return 0, cal time self
+                int animateTime = (int) (System.currentTimeMillis() - mStartTimeMill);
                 for (int i = 0; i < DELAY.length; ++i) {
                     int duration = Math.max(0, animateTime - DELAY[i]) % ANIMATION_DURATION;
-                    float percent = duration / (float) ANIMATION_DURATION;
-                    mAlpha[i] = Math.max(MIN_ALPHA, (int) ((1 - percent) * MAX_ALPHA));
-                    mScale[i] = Math.max(MIN_SCALE, (1 - percent) * MAX_SCALE);
+                    float percent;
+                    if (duration < ANIMATION_DURATION / 2) {
+                        percent = (ANIMATION_DURATION - duration) / (float) ANIMATION_DURATION;
+                    } else {
+                        percent = duration / (float) ANIMATION_DURATION;
+                    }
+                    mAlpha[i] = (int) (percent * MAX_ALPHA);
+                    mScale[i] = percent * MAX_SCALE;
                     mParent.invalidate();
                 }
             }
         };
-        mAnimation.setDuration(ANIMATION_DURATION);
-        mAnimation.setRepeatCount(Animation.INFINITE);
+        mAnimation.setDuration(Long.MAX_VALUE);
         mAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
 
         Animation.AnimationListener listener = new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
+                mStartTimeMill = System.currentTimeMillis();
             }
 
             @Override
@@ -158,7 +163,6 @@ public class LineSpinLoadingDrawable extends Drawable implements Animatable {
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                mRepeatCount++;
             }
         };
         mAnimation.setAnimationListener(listener);
