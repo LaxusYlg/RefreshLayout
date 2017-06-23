@@ -145,7 +145,7 @@ public class SwipeRefreshManager extends RefreshLayout.RefreshManager {
 
     @Override
     protected boolean acceptScroll() {
-        return false;
+        return !mIsRefreshing;
     }
 
     @Override
